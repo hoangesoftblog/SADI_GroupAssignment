@@ -4,13 +4,16 @@ package com.demo.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Entity
-//@Table(name = "cities")
-public class Product {
+@Table(indexes = @Index(name = "ShopeeProductIndex", columnList = "ShopeeID, ShopeeShopID"))
+public class Product implements Serializable {
+    private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,14 +22,14 @@ public class Product {
     private String name;
 
     // orphanRemoval means when delete Product, automatically delete all PriceHistories
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<PriceHistory> histories = new ArrayList<>();
 
-    @Column
+    @Column(length = 65535)
     private String description;
 
-    @Column(columnDefinition = "TEXT")
+//    @Column(columnDefinition = "TEXT")
+    @Column
     private String url;
 
     @Column
@@ -35,15 +38,23 @@ public class Product {
     @Column
     private Boolean isDeleted = false;
 
-//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-//    @JsonManagedReference
-//    private List<Comment> comments;
+    @Column
+    private Long shopeeID;
+
+    @Column
+    private Long shopeeShopID;
+
+    @Column
+    private String brand;
+
+    @Column
+    private String type;
 
     @Column
     private String UUID;
 
     @Column
-    private Long basePrice;
+    private Long currentPrice;
 
     @Column
     private Long lowestPrice;
@@ -51,12 +62,49 @@ public class Product {
 
     // Methods
 
-    public long getBasePrice() {
-        return basePrice;
+
+    public String getBrand() {
+        return brand;
     }
 
-    public void setBasePrice(Long basePrice) {
-        this.basePrice = basePrice;
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Product(Long id) {
+        this.id = id;
+    }
+
+    public Long getShopeeID() {
+        return shopeeID;
+    }
+
+    public void setShopeeID(Long shopeeID) {
+        this.shopeeID = shopeeID;
+    }
+
+    public Boolean getHidden() {
+        return isHidden;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public long getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(Long currentPrice) {
+        this.currentPrice = currentPrice;
     }
 
     public Long getLowestPrice() {
@@ -75,13 +123,13 @@ public class Product {
         this.UUID = UUID;
     }
 
-//    public List<Comment> getComments() {
-//        return comments;
-//    }
-//
-//    public void setComments(List<Comment> comments) {
-//        this.comments = comments;
-//    }
+    public Long getShopeeShopID() {
+        return shopeeShopID;
+    }
+
+    public void setShopeeShopID(Long shopeeShopID) {
+        this.shopeeShopID = shopeeShopID;
+    }
 
     public Boolean isDeleted() {
         return isDeleted;
@@ -133,6 +181,7 @@ public class Product {
         this.name = name;
     }
 
+    @JsonManagedReference
     public List<PriceHistory> getHistories() {
         return histories;
     }

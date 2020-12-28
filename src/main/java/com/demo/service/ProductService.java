@@ -17,33 +17,43 @@ public class ProductService {
 
     // When add,
     // If no ID, write new.
-    // Else, doesn't overwrite existing details except adding new Histories
+    // Else, DO NOT OVERWRITE existing details except adding new Histories (That is for update)
     // Lowest price is automatically added based on List of Histories
-    private Product prepareToAdd(Product product) {
-        Product p;
-        if (product.getId() == null) {
-            p = product;
-        }
-        else {
-            // Prevent overwriting existing Product information
-            Optional<Product> o = store.findById(product.getId());
-            p = o.orElse(product);
-            p.setHistories(product.getHistories());
-        }
-
-        if (!p.getHistories().isEmpty()) {
-            p.getHistories().forEach(priceHistory -> priceHistory.setProduct(p));
-
-            //Find min price in the previous history
-            Long min = Collections.min(p.getHistories(), (history, t1) -> (int) (history.getPrice() - t1.getPrice())).getPrice();
-            // And set new lowest record if smaller than current lowest value
-            p.setLowestPrice(Optional.ofNullable(p.getLowestPrice()).filter(lowest -> lowest < min).orElse(min));
-        }
-        else {
-            p.setLowestPrice(Optional.ofNullable(p.getLowestPrice()).orElse(p.getBasePrice()));
-        }
+    private Product maintainProductInfo(Product product) {
+        Product p = store.findById(Optional.ofNullable(product.getId()).orElse(0L)).orElse(product);
+        p.setHistories(product.getHistories());
 
         return p;
+    }
+
+    /**
+     * To allow Hibernate to store property with OneToMany relationship, Product p's History must contain a reference of p <br/>
+     * https://stackoverflow.com/a/5217052
+     * @param p - The Product to apply
+     * @return p - The same Product after applying the function
+     */
+    private Product setRelationshipForHistory(Product p) {
+        p.getHistories().forEach(priceHistory -> priceHistory.setProduct(p));
+        return p;
+    }
+
+    private Product setNewLowestPrice(Product product) {
+        if (!product.getHistories().isEmpty()) {
+            //Find min price in the History array, and set new Lowest Price
+            Long min = Collections.min(product.getHistories(), (history, t1) -> (int) (history.getPrice() - t1.getPrice())).getPrice();
+            product.setLowestPrice(Optional.ofNullable(product.getLowestPrice()).filter(lowest -> lowest < min).orElse(min));
+        }
+        else {
+            product.setLowestPrice(Optional.ofNullable(product.getLowestPrice()).orElse(product.getCurrentPrice()));
+        }
+
+        return product;
+    }
+
+    private Product prepareToAdd(Product product) {
+        Product p = setRelationshipForHistory(maintainProductInfo(product));
+        Product p1 = setNewLowestPrice(p);
+        return p1;
     }
 
     public void add(Product product) {
@@ -51,6 +61,7 @@ public class ProductService {
         store.save(p);
     }
 
+    // Not completely optimized
     public void addAll(List<Product> products){
         List<Product> productList = products.stream().map(this::prepareToAdd).collect(Collectors.toList());
         store.saveAll(productList);
@@ -61,8 +72,13 @@ public class ProductService {
     }
 
     public List<Product> getAll() {
-        return new ArrayList<>(store.findAll());
+        return store.findAll();
     }
+
+    public List<Product> getSome(List<Long> ids) {
+        return store.findAllById(ids);
+    }
+
 
     // Must have ID to allow for update
     // Update doesn't allow to add new Product or add new Histories of Product
@@ -89,4 +105,19 @@ public class ProductService {
             update(p);
         }
     }
+
+    public List<Product> findAllNotHidden() {
+        return store.findAllByIsHiddenFalse();
+    }
 }
+
+
+//        if (product.getId() == null) {
+//            p = product;
+//        }
+//        else {
+//            // Prevent overwriting existing Product information
+//            Optional<Product> o = store.findById(product.getId());
+//            p = o.orElse(product);
+//
+//        }

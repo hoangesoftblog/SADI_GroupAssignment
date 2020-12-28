@@ -3,10 +3,13 @@ package com.demo.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-public class PriceHistory {
+public class PriceHistory implements Serializable {
+    private static final Long serialVersionUID = Double.valueOf(Math.E * Math.pow(10, 6)).longValue();
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     public Long id;
@@ -14,11 +17,10 @@ public class PriceHistory {
     @Column
     public Long price;
 
-    @Temporal(value = TemporalType.DATE)
+    @Temporal(value = TemporalType.TIMESTAMP)
     public java.util.Date date;
 
-    @ManyToOne
-    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     public Product product;
 
 
@@ -46,6 +48,7 @@ public class PriceHistory {
         this.date = date;
     }
 
+    @JsonBackReference
     public Product getProduct() {
         return product;
     }
