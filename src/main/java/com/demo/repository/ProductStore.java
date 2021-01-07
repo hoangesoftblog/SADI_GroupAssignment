@@ -2,6 +2,9 @@ package com.demo.repository;
 
 
 import com.demo.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductStore extends CrudRepository<Product, Long> {
+public interface ProductStore extends JpaRepository<Product, Long> {
     @Override
     List<Product> findAll();
 
@@ -21,4 +24,10 @@ public interface ProductStore extends CrudRepository<Product, Long> {
     List<Product> findAllById(Iterable<Long> longs);
 
     List<Product> findAllByIsHiddenFalse();
+
+    Optional<Product> findFirstByShopeeIDAndShopeeShopID(Long shopeeID, Long shopeeShopID);
+
+    List<Product> findAllByCategories_Id(Long categoryID);
+
+    Page<Product> findAllByHiddenIsFalse(Pageable pageable);
 }

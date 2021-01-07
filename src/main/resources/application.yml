@@ -1,5 +1,14 @@
-server:
-  port: 9000
+#spring:
+#  jpa:
+#    properties:
+#      hibernate:
+#        search:
+#          default:
+#            indexmanager: elasticsearch
+#            elasticsearch:
+#              host: <Elasticsearch-url>
+#              index_schema_management_strategy: drop-and-create
+#              required_index_status: yellow
 #spring:
 #  kafka:
 #    consumer:

@@ -1,12 +1,14 @@
 package com.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Table(indexes = @Index(name = "product_id", columnList = "product_id"))
 public class PriceHistory implements Serializable {
     private static final Long serialVersionUID = Double.valueOf(Math.E * Math.pow(10, 6)).longValue();
 
@@ -20,7 +22,7 @@ public class PriceHistory implements Serializable {
     @Temporal(value = TemporalType.TIMESTAMP)
     public java.util.Date date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     public Product product;
 
 

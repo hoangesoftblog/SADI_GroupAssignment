@@ -1,35 +1,50 @@
 package com.demo.model;
 
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Entity
-@Table(indexes = @Index(name = "ShopeeProductIndex", columnList = "ShopeeID, ShopeeShopID"))
+@Indexed
+@Table(indexes = {
+        @Index(name = "ShopeeProductIndex", columnList = "shopeeID, shopeeShopID"),
+        @Index(name = "productType", columnList = "type")
+})
 public class Product implements Serializable {
+
     private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column
+    @Field
     private String name;
 
     // orphanRemoval means when delete Product, automatically delete all PriceHistories
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<PriceHistory> histories = new ArrayList<>();
 
-    @Column(length = 65535)
+    @Transient
+    private static final int max_length = 65535;
+
+    @Column(length = max_length)
     private String description;
 
-//    @Column(columnDefinition = "TEXT")
+    // @Column(columnDefinition = "TEXT")
     @Column
+    //Product page for Shopee can be transient,
+    // since it can be created with format: https://shopee.vn/product/<shopeeShopID>/<shopeeID>
     private String url;
 
     @Column
@@ -48,6 +63,7 @@ public class Product implements Serializable {
     private String brand;
 
     @Column
+    @Field
     private String type;
 
     @Column
@@ -56,12 +72,23 @@ public class Product implements Serializable {
     @Column
     private Long currentPrice;
 
+    // Lowest and Highest price ever
     @Column
     private Long lowestPrice;
+
+    @Column
+    private Long highestPrice;
 
 
     // Methods
 
+    public Long getHighestPrice() {
+        return highestPrice;
+    }
+
+    public void setHighestPrice(Long highestPrice) {
+        this.highestPrice = highestPrice;
+    }
 
     public String getBrand() {
         return brand;
@@ -152,7 +179,7 @@ public class Product implements Serializable {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description.substring(0, Math.min(max_length + 1, description.length()));
     }
 
     public String getUrl() {
@@ -163,7 +190,8 @@ public class Product implements Serializable {
         this.url = url;
     }
 
-    public Product() { }
+    public Product() {
+    }
 
     public Long getId() {
         return id;
@@ -187,7 +215,7 @@ public class Product implements Serializable {
     }
 
     public void setHistories(List<PriceHistory> histories) {
-        this.histories = histories;
+        this.histories = Optional.ofNullable(histories).orElse(new ArrayList<>());
     }
 
     public void addHistories(List<PriceHistory> histories) {
@@ -196,6 +224,74 @@ public class Product implements Serializable {
 
     @Override
     public String toString() {
-        return (String.format("Product: [name - %s,\ndescription: %s, \nURL: %s", name, description, url));
+        return (String.format("Product: [name - %s,\nid: %s \ncategory: %s]", name, id, categories));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        else if (obj == null) return false;
+        else if (!(obj instanceof Product)) return false;
+        else {
+            Product p = (Product) obj;
+            return p.shopeeID.equals(this.shopeeID) && p.shopeeShopID.equals(this.shopeeShopID);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shopeeID, shopeeShopID);
+    }
+
+
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name = "product_category",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"),
+            indexes = {
+                    @Index(name = "products", columnList = "product_id"),
+                    @Index(name = "categories", columnList = "category_id"),
+            }
+    )
+    private Set<Category> categories;
+
+//    @JsonManagedReference
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+
+
+    @Override
+    public Product clone() {
+        Product p;
+        try {
+            p = (Product) super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Automatic copy of Product failed. Manual copy instead\n");
+
+            p = new Product();
+            p.setId(this.id);
+            p.setName(this.name);
+            p.setHistories(this.histories);
+            p.setDescription(this.description);
+            p.setDeleted(this.isDeleted);
+            p.setHidden(this.isHidden);
+            p.setHighestPrice(this.highestPrice);
+            p.setCurrentPrice(this.currentPrice);
+            p.setLowestPrice(this.lowestPrice);
+            p.setBrand(this.brand);
+            p.setShopeeID(this.shopeeID);
+            p.setShopeeShopID(this.shopeeShopID);
+            p.setType(this.type);
+            p.setUrl(this.url);
+            p.setUUID(this.UUID);
+        }
+        return p;
     }
 }

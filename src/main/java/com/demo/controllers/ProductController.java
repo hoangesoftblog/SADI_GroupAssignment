@@ -8,46 +8,43 @@ import com.demo.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/product")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProductController {
 
-//    @Autowired
-//    public Producer producer;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public ProductService service;
+
 
     @PostMapping(value = "/add")
     public void add(@RequestBody Product product) {
         service.add(product);
     }
 
-    @PostMapping(value = "/add/all")
-    public void addAll(@RequestBody List<Product> products) { service.addAll(products); }
 
-    @GetMapping(value = "/get")
-    @Cacheable(value = "product", key = "#id")
-    public Product get(@RequestParam Long id){
-        logger.info("Get product with ID = " + id);
+
+    @GetMapping(value = "/get/{id}")
+//    @Cacheable(value = "product", key = "#id", unless = "#result == null")
+    public Product get(@PathVariable Long id){
         return service.get(id);
     }
 
 //    @GetMapping(value = "/get/all")
-//    @Cacheable(value = "products", key = "#")
-//    public List<Product> getAll(){
-//        return service.getAll();
+//    public List<Product> getAllNotHidden() {
+//        return service.getAllNotHidden();
 //    }
+
+    @GetMapping(value = "/get/category/{id}")
+    public List<Product> findByCategoryId(@PathVariable Long id) { return service.findByCategoryId(id); }
 
     @GetMapping(value = "/find")
     public List<Product> find(@RequestParam String params) {
@@ -55,16 +52,13 @@ public class ProductController {
     }
 
     @GetMapping(value = "/get/all")
-    public List<Product> getAllNotHidden() {
-        return service.findAllNotHidden();
+    public Page<Product> getAllNotHiddenWithPage(@RequestParam(defaultValue = "0") int page) {
+        return service.getAllNotHiddenWithPage(page);
     }
 
 
     @PutMapping(value = "/update")
-    @CacheEvict(value = "product", key = "#product.id")
     public void update(@RequestBody Product product) {
-        logger.info("Update product with ID = " + product.getId());
-
         product.setHistories(null);
         service.update(product);
     }

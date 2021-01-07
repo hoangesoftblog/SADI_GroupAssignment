@@ -3,19 +3,17 @@ package com.demo.controllers;
 import com.demo.model.PriceHistory;
 import com.demo.service.PriceHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/price")
+@RequestMapping(value = "/history")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PriceHistoryController {
     @Autowired
     public PriceHistoryService service;
 
-//    @PostMapping(value = "/add")
-//    public void add(@RequestBody PriceHistory history) { service.add(history); }
-
-
+    @GetMapping(value = "/get")
+    public PriceHistory get(@RequestParam Long id) {
+        return service.get(id);
+    }
 }
