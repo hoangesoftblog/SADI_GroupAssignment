@@ -1,13 +1,18 @@
 package com.demo.model;
 
+import com.demo.config.AppConfig;
 import com.fasterxml.jackson.annotation.*;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Where;
+import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Parameter;
 
 import javax.persistence.*;
+import javax.persistence.Index;
 import java.io.Serializable;
 import java.util.*;
 
@@ -15,18 +20,19 @@ import java.util.*;
 @Indexed
 @Table(indexes = {
         @Index(name = "ShopeeProductIndex", columnList = "shopeeID, shopeeShopID"),
-        @Index(name = "productType", columnList = "type")
-})
-public class Product implements Serializable {
+        @Index(name = "productBrand", columnList = "brand"),
 
+})
+@Where(clause = "is_deleted = false and is_hidden = false and stock > 0")
+public class Product implements Serializable {
     private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    @Field
+    @Field(termVector = TermVector.YES)
     private String name;
 
     // orphanRemoval means when delete Product, automatically delete all PriceHistories
@@ -35,13 +41,10 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<PriceHistory> histories = new ArrayList<>();
 
-    @Transient
-    private static final int max_length = 65535;
-
-    @Column(length = max_length)
+    // @Column(columnDefinition = "TEXT")
+    @Column(length = AppConfig.CONSTANT.Product.max_length)
     private String description;
 
-    // @Column(columnDefinition = "TEXT")
     @Column
     //Product page for Shopee can be transient,
     // since it can be created with format: https://shopee.vn/product/<shopeeShopID>/<shopeeID>
@@ -60,27 +63,96 @@ public class Product implements Serializable {
     private Long shopeeShopID;
 
     @Column
+    @Field(analyze = Analyze.NO)
     private String brand;
 
     @Column
-    @Field
     private String type;
 
     @Column
     private String UUID;
 
     @Column
+    @Field
+    @SortableField
     private Long currentPrice;
 
     // Lowest and Highest price ever
     @Column
+    @Field
+    @SortableField
     private Long lowestPrice;
 
     @Column
+    @Field
+    @SortableField
     private Long highestPrice;
+
+    @Field
+    @SortableField
+    @Column
+    private Double rating;
+
+    @Column
+    private Long stock;
+
+    @Column
+    // Status 8 is Hidden
+    private int status;
+
+    @Column
+    private String productAvatar;
+
+
+    @Fetch(FetchMode.JOIN)
+    @ElementCollection
+    @JoinTable(name = "product_image", joinColumns = @JoinColumn(name = "product_id"))
+    // https://cf.shopee.vn/file/<image_id>
+    private List<String> images;
 
 
     // Methods
+
+
+    public String getProductAvatar() {
+        return productAvatar;
+    }
+
+    public void setProductAvatar(String productAvatar) {
+        this.productAvatar = productAvatar;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Long getStock() {
+        return stock;
+    }
+
+    public void setStock(Long stock) {
+        this.stock = stock;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = Optional.ofNullable(rating).orElse(-1D);
+    }
 
     public Long getHighestPrice() {
         return highestPrice;
@@ -179,7 +251,10 @@ public class Product implements Serializable {
     }
 
     public void setDescription(String description) {
-        this.description = description.substring(0, Math.min(max_length + 1, description.length()));
+//        System.out.println(description);
+//        int min_length = Math.min(AppConfig.CONSTANT.Product.max_length + 1, description.length());
+//        System.out.println(min_length);
+        this.description = description;
     }
 
     public String getUrl() {
@@ -244,8 +319,8 @@ public class Product implements Serializable {
     }
 
 
-
     @ManyToMany(cascade = {CascadeType.ALL})
+    @Fetch(FetchMode.JOIN)
     @JoinTable(name = "product_category",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"),
@@ -254,6 +329,7 @@ public class Product implements Serializable {
                     @Index(name = "categories", columnList = "category_id"),
             }
     )
+    @IndexedEmbedded
     private Set<Category> categories;
 
 //    @JsonManagedReference

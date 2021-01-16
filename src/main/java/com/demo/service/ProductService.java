@@ -1,11 +1,10 @@
 package com.demo.service;
 
+import com.demo.config.AppConfig;
 import com.demo.model.Category;
 import com.demo.model.Product;
 import com.demo.repository.CategoryStore;
 import com.demo.repository.ProductStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,29 +24,12 @@ public class ProductService implements RemoveDependency<Product> {
     @Autowired
     public CategoryStore categoryStore;
 
-//    @Autowired
-//    public CategoryService categoryService;
-
-    Logger logger = LoggerFactory.getLogger(this.getClass());
-
     // When add: If no ID, write new.
-    // Else, DO NOT OVERWRITE existing details except adding new Histories (That is for update)
     // Lowest price is automatically added based on List of Histories
     private Product maintainProductIntegrity(Product product) {
-        Product p;
-        if (Optional.ofNullable(product.getId()).isPresent()) {
-            p = productStore.findById(product.getId()).orElse(product);
-        }
-        else {
-            p = productStore.findFirstByShopeeIDAndShopeeShopID(product.getShopeeID(), product.getShopeeShopID()).orElse(product);
-        }
-
-        p.setHistories(product.getHistories());
+        Product p = productStore.findFirstByShopeeIDAndShopeeShopID(product.getShopeeID(), product.getShopeeShopID()).orElse(product);
+        p.getHistories().addAll(product.getHistories());
         p.setCategories(product.getCategories());
-
-//        System.out.println("Found products with ID: " + p.getId());
-//        System.out.println(p.getCategories());
-//        System.out.println();
         return p;
     }
 
@@ -94,7 +76,11 @@ public class ProductService implements RemoveDependency<Product> {
                 .map(category -> {
 //                    System.out.println("Category before: ");
 //                    System.out.println(category);
-                    Optional<Category> c = categoryStore.findFirstByShopeeCategoryID(category.getShopeeCategoryID());
+//                    Optional<Long> category_correct_id = Optional.ofNullable(categoryService.getIDCategoryByShopeeID(category.getShopeeCategoryID()));
+//                    Optional<Category> c = category_correct_id.map(id -> entityManager.getReference(Category.class, id));
+
+                    Optional<Category> c = (categoryStore.findByShopeeCategoryID(category.getShopeeCategoryID()));
+
 //                    System.out.println(c.isPresent() ? c : "Can not find in the DB");
 //                    System.out.println();
                     return c.orElse(category);
@@ -110,8 +96,18 @@ public class ProductService implements RemoveDependency<Product> {
         return product;
     }
 
+    private Product setProductAvatar(Product product) {
+        if (product.getProductAvatar() == null) {
+            if (product.getImages() != null && product.getImages().size() > 1) {
+                product.setProductAvatar(product.getImages().get(0));
+            }
+        }
+        return product;
+    }
+
     private Product prepareToAdd(Product product) {
-        Product p_init = maintainCategoryIntegrity(product);
+        Product p_init = maintainCategoryIntegrity
+                (product);
         Product p3 = maintainProductIntegrity
                 (p_init);
 
@@ -119,7 +115,9 @@ public class ProductService implements RemoveDependency<Product> {
         Product p1 = setNewLowestPrice(p);
         Product p2 = setNewHighestPrice(p1);
 
-        Product p_final = (p2);
+        Product p4 = setProductAvatar(p2);
+
+        Product p_final = (p4);
 
         return p_final;
     }
@@ -143,11 +141,23 @@ public class ProductService implements RemoveDependency<Product> {
     // Remove dependency for GET methods
     @Override
     public Product GetMethod_RemoveDependency(Product product) {
-        product.getCategories().forEach(category -> {
-            category.setProducts(null);
-        });
+//        Product p = product.clone();
+//
+//        product.getCategories().forEach(category -> {
+//            category.setProducts(null);
+//        });
+//
+//        p.setCategories(product.getCategories());
+//
+//        List<PriceHistory> priceHistories = product.getHistories()
+//                .stream()
+//                .map(PriceHistory::clone)
+//                .collect(Collectors.toList());
+//
+//        p.setHistories(priceHistories);
         return product;
     }
+
     public Product removeDependency(Product product) {
         return GetMethod_RemoveDependency(product);
     }
@@ -176,20 +186,20 @@ public class ProductService implements RemoveDependency<Product> {
         return products;
     }
 
-    public List<Product> getAllNotHidden() {
-        List<Product> products = productStore.findAllByIsHiddenFalse();
+    public List<Product> getAll() {
+        List<Product> products = productStore.findAll();
         products.forEach(this::removeDependency);
         return products;
     }
 
     public List<Product> findByCategoryId(Long categoryId){
-        List<Product> products = productStore.findAllByCategories_Id(categoryId);
+        List<Product> products = productStore.findAllByCategories_ShopeeCategoryID(categoryId);
         products.forEach(this::removeDependency);
         return products;
     }
 
-    public Page<Product> getAllNotHiddenWithPage(int page_number) {
-        Pageable pageRequest = PageRequest.of(page_number, 1);
+    public Page<Product> getAllWithPage(int page_number) {
+        Pageable pageRequest = PageRequest.of(page_number, AppConfig.CONSTANT.Pagination.page_size);
         Page<Product> products = productStore.findAll(pageRequest);
         products.forEach(this::removeDependency);
         return products;

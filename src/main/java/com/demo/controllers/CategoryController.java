@@ -1,5 +1,7 @@
 package com.demo.controllers;
 
+import com.demo.DTO.CategoryDTO;
+import com.demo.DTO_Converter.CategoryDTOService;
 import com.demo.model.Category;
 import com.demo.model.Product;
 import com.demo.service.CategoryService;
@@ -14,18 +16,18 @@ import java.util.List;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CategoryController {
     @Autowired
-    public CategoryService service;
+    public CategoryDTOService service;
 
     @GetMapping(value = "/get")
-    public Category getByShopeeCategoryID(@RequestParam Long shopeeID) {
+    public CategoryDTO getByShopeeCategoryID(@RequestParam Long shopeeID) {
         return service.getCategoryByShopeeID(shopeeID);
     }
 
     @GetMapping(value = "/get/{id}")
-    public Category getByID(@PathVariable Long id) {return service.findByID(id);}
+    public CategoryDTO getByID(@PathVariable Long id) {return service.findByID(id);}
 
     @GetMapping(value = "/get/all")
-    public List<Category> getAllCategories(){
+    public List<CategoryDTO> getAllCategories(){
         return service.getAll();
     }
 

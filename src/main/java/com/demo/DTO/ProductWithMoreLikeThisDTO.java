@@ -1,21 +1,51 @@
 package com.demo.DTO;
 
-import com.demo.model.Category;
-import com.demo.model.PriceHistory;
-
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class ProductDTO implements Serializable {
-    public static class CategoryForProductDTO implements Serializable {
+public class ProductWithMoreLikeThisDTO {
+    public Long id;
+    public String name;
+    public List<PriceHistoryDTO> histories = new ArrayList<>();
+    public String description;
+    public String url;
+    public Long shopeeID;
+    public Long shopeeShopID;
+    public String brand;
+    public String UUID;
+    public Long currentPrice;
+    public Long lowestPrice;
+    public Long highestPrice;
+    public Double rating;
+    public Long stock;
+    public int status;
+    public List<ProductDTO.CategoryForProductDTO> categories;
+    public List<String> images;
+    public String productAvatar;
+
+
+
+    public static class MoreLikeThisProduct {
+        public List<String> images;
         public Long id;
         public String name;
-        public int img;
-        public Long shopeeCategoryID;
+        public String productAvatar;
 
-        private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+        public String getProductAvatar() {
+            return productAvatar;
+        }
+
+        public void setProductAvatar(String productAvatar) {
+            this.productAvatar = productAvatar;
+        }
+
+        public List<String> getImages() {
+            return images;
+        }
+
+        public void setImages(List<String> images) {
+            this.images = images;
+        }
 
         public Long getId() {
             return id;
@@ -32,45 +62,9 @@ public class ProductDTO implements Serializable {
         public void setName(String name) {
             this.name = name;
         }
-
-        public int getImg() {
-            return img;
-        }
-
-        public void setImg(int img) {
-            this.img = img;
-        }
-
-        public Long getShopeeCategoryID() {
-            return shopeeCategoryID;
-        }
-
-        public void setShopeeCategoryID(Long shopeeCategoryID) {
-            this.shopeeCategoryID = shopeeCategoryID;
-        }
     }
+    public List<MoreLikeThisProduct> moreLikeThisProducts;
 
-//    public Long id;
-    public String name;
-    public List<PriceHistoryDTO> histories = new ArrayList<>();
-    public String description;
-    public String url;
-    public Boolean isHidden = false;
-    public Boolean isDeleted = false;
-    public Long shopeeID;
-    public Long shopeeShopID;
-    public String brand;
-    public String type;
-    public String UUID;
-    public Long currentPrice;
-    public Long lowestPrice;
-    public Long highestPrice;
-    public Double rating;
-    public Long stock;
-    public int status;
-    public List<CategoryForProductDTO> categories;
-    public List<String> images;
-    public String productAvatar;
 
     public String getProductAvatar() {
         return productAvatar;
@@ -80,15 +74,13 @@ public class ProductDTO implements Serializable {
         this.productAvatar = productAvatar;
     }
 
-    private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+    public Long getId() {
+        return id;
+    }
 
-//    public Long getId() {
-//        return id;
-//    }
-//
-//    public void setId(Long id) {
-//        this.id = id;
-//    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -122,22 +114,6 @@ public class ProductDTO implements Serializable {
         this.url = url;
     }
 
-    public Boolean getHidden() {
-        return isHidden;
-    }
-
-    public void setHidden(Boolean hidden) {
-        isHidden = hidden;
-    }
-
-    public Boolean getDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        isDeleted = deleted;
-    }
-
     public Long getShopeeID() {
         return shopeeID;
     }
@@ -160,14 +136,6 @@ public class ProductDTO implements Serializable {
 
     public void setBrand(String brand) {
         this.brand = brand;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getUUID() {
@@ -226,11 +194,11 @@ public class ProductDTO implements Serializable {
         this.status = status;
     }
 
-    public List<CategoryForProductDTO> getCategories() {
+    public List<ProductDTO.CategoryForProductDTO> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<CategoryForProductDTO> categories) {
+    public void setCategories(List<ProductDTO.CategoryForProductDTO> categories) {
         this.categories = categories;
     }
 
@@ -240,5 +208,13 @@ public class ProductDTO implements Serializable {
 
     public void setImages(List<String> images) {
         this.images = images;
+    }
+
+    public List<MoreLikeThisProduct> getMoreLikeThisProducts() {
+        return moreLikeThisProducts;
+    }
+
+    public void setMoreLikeThisProducts(List<MoreLikeThisProduct> moreLikeThisProducts) {
+        this.moreLikeThisProducts = moreLikeThisProducts;
     }
 }

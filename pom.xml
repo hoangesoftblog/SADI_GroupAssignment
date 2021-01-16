@@ -35,7 +35,6 @@
 		</dependency>
 
 		<!--for postgresql -->
-
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -68,9 +67,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>5.4.3.Final</version>
+<!--			<version>5.4.3.Final</version>-->
 		</dependency>
 
 		<!-- spring data redis dependency -->
@@ -82,6 +81,51 @@
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 		</dependency>
+
+		<!-- Hibernate Search-->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-search-orm</artifactId>
+			<version>5.10.10.Final</version>
+		</dependency>
+
+		<!-- Used in Data Transfer Object (DTO), to clone an Object managed by Hibernate,
+		 into new Object that doesn't have any reference
+		 -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>2.3.5</version>
+		</dependency>
+
+		<!-- Hibernate Second-Level Caching, which allow to cache Entity managed by Hibernate.
+		Already in Spring Boot Starter Parent
+		 -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<groupId>net.sf.ehcache</groupId>-->
+<!--					<artifactId>ehcache</artifactId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
+		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>net.sf.ehcache</groupId>-->
+<!--			<artifactId>ehcache</artifactId>-->
+<!--			<version>2.10.6</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.ehcache</groupId>-->
+<!--			<artifactId>ehcache</artifactId>-->
+<!--			<version>3.6.3</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.hibernate</groupId>-->
+<!--			<artifactId>hibernate-jcache</artifactId>-->
+<!--		</dependency>-->
 
 
 	</dependencies>

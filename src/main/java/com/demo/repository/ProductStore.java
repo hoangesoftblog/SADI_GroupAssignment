@@ -27,7 +27,9 @@ public interface ProductStore extends JpaRepository<Product, Long> {
 
     Optional<Product> findFirstByShopeeIDAndShopeeShopID(Long shopeeID, Long shopeeShopID);
 
-    List<Product> findAllByCategories_Id(Long categoryID);
+    List<Product> findAllByCategories_ShopeeCategoryID(Long categoryID);
 
     Page<Product> findAllByHiddenIsFalse(Pageable pageable);
+
+    Page<Product> findAll(Pageable pageable);
 }

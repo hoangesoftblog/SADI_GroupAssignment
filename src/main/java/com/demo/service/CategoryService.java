@@ -1,27 +1,18 @@
 package com.demo.service;
 
 import com.demo.model.Category;
-import com.demo.model.Product;
 import com.demo.repository.CategoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Transactional
 @Service
 public class CategoryService implements RemoveDependency<Category> {
-
-    @PersistenceContext
-    public EntityManager entityManager;
 
 //    @Autowired
 //    public CategoryService(EntityManagerFactory entityManagerFactory) {
@@ -39,21 +30,21 @@ public class CategoryService implements RemoveDependency<Category> {
      * @param shopeeCategoryID
      * @return Category
      */
+//    @Cacheable(value = "category", key = "#shopeeCategoryID", unless = "#result == null")
     public Category getCategoryByShopeeID(Long shopeeCategoryID) {
-        Optional<Category> c = categoryStore.findFirstByShopeeCategoryID(shopeeCategoryID);
-        c.ifPresent(this::GetMethod_RemoveDependency);
+        Optional<Category> c = categoryStore.findByShopeeCategoryID(shopeeCategoryID);
+//        c.ifPresent(this::GetMethod_RemoveDependency);
         return c.orElse(null);
     }
 
+//    public Long getIDCategoryByShopeeID(Long shopeeCategoryID) {
+//        Category c = getCategoryByShopeeID(shopeeCategoryID);
+//        Long returnID = Optional.ofNullable(c).map(Category::getId).orElse(null);
+//        return returnID;
+//    }
+
     @Override
     public Category GetMethod_RemoveDependency(Category category) {
-
-        Set<Product> products = category.getProducts()
-                .stream()
-                .map(Product::clone)
-                .collect(Collectors.toSet());
-        category.setProducts(products);
-
         return category;
     }
 

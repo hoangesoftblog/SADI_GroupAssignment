@@ -1,6 +1,7 @@
 package com.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
@@ -13,16 +14,17 @@ public class PriceHistory implements Serializable {
     private static final Long serialVersionUID = Double.valueOf(Math.E * Math.pow(10, 6)).longValue();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @Column
     public Long price;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Temporal(value = TemporalType.TIMESTAMP)
     public java.util.Date date;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     public Product product;
 
 
@@ -57,5 +59,21 @@ public class PriceHistory implements Serializable {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    @Override
+    public PriceHistory clone() {
+        PriceHistory priceHistory;
+        try {
+            priceHistory = (PriceHistory) super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Automatic copy of PriceHistory failed. Manual copy instead.\n");
+            priceHistory = new PriceHistory();
+            priceHistory.setDate(this.date);
+            priceHistory.setId(this.id);
+            priceHistory.setPrice(this.price);
+        }
+
+        return priceHistory;
     }
 }

@@ -5,6 +5,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.persistence.*;
 import java.io.IOException;
@@ -12,25 +19,27 @@ import java.io.Serializable;
 import java.util.*;
 
 @Entity
-@Table(indexes = @Index(name = "Shopee_Category", columnList = "shopeeCategoryID"))
+@Table(indexes = {
+        @Index(name = "Shopee_Category", columnList = "shopeeCategoryID"),
+        @Index(name = "category_name", columnList = "name")
+})
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Category implements Serializable {
 
     private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    
+    @Transient
     private Long id;
 
     @Column
-
+    @Field(analyze = Analyze.NO)
     private String name;
 
     @Column
     private int img;
 
-    @Column
-
+    @Id
     private Long shopeeCategoryID;
 
     
@@ -72,7 +81,7 @@ public class Category implements Serializable {
     }
 
     
-    @ManyToMany(mappedBy = "categories")
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     Set<Product> products = new HashSet<>();
 
 //    @JsonBackReference

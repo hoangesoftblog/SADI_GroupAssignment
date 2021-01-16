@@ -3,7 +3,12 @@ package com.demo.controllers;
 
 //import com.demo.engine.product.Producer;
 
+import com.demo.DTO.ProductDTO;
+import com.demo.DTO.ProductWithMoreLikeThisDTO;
+import com.demo.DTO_Converter.ProductDTOService;
+import com.demo.DTO_Converter.ProductWithMoreLikeThisDTOService;
 import com.demo.model.Product;
+import com.demo.repository.ProductStore;
 import com.demo.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +24,9 @@ import java.util.List;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProductController {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
-    public ProductService service;
-
+    public com.demo.engine.product.Producer service;
+//    public ProductService service;
 
     @PostMapping(value = "/add")
     public void add(@RequestBody Product product) {
@@ -32,39 +35,49 @@ public class ProductController {
 
 
 
+
+    @Autowired
+    public ProductWithMoreLikeThisDTOService productWithMoreLikeThisDTOService;
+
     @GetMapping(value = "/get/{id}")
 //    @Cacheable(value = "product", key = "#id", unless = "#result == null")
-    public Product get(@PathVariable Long id){
-        return service.get(id);
+    public ProductWithMoreLikeThisDTO get(@PathVariable Long id){
+        return productWithMoreLikeThisDTOService.get(id);
     }
 
-//    @GetMapping(value = "/get/all")
-//    public List<Product> getAllNotHidden() {
-//        return service.getAllNotHidden();
-//    }
+
+    @Autowired
+    public ProductDTOService productDTOService;
 
     @GetMapping(value = "/get/category/{id}")
-    public List<Product> findByCategoryId(@PathVariable Long id) { return service.findByCategoryId(id); }
+    public List<ProductDTO> findByCategoryId(@PathVariable Long id) { return productDTOService.findByCategoryId(id); }
 
     @GetMapping(value = "/find")
-    public List<Product> find(@RequestParam String params) {
-        return service.find(params);
+    public List<ProductDTO> find(@RequestParam String params) {
+        return productDTOService.find(params);
     }
 
-    @GetMapping(value = "/get/all")
-    public Page<Product> getAllNotHiddenWithPage(@RequestParam(defaultValue = "0") int page) {
-        return service.getAllNotHiddenWithPage(page);
+    @GetMapping(value = "/get/all/page/{page}")
+    public Page<ProductDTO> getAllNotHiddenWithPage(@PathVariable int page) {
+        return productDTOService.getAllWithPage(page);
+    }
+
+    @GetMapping(value = "/get/all/if_you_get_this_api_this_will_be_the_end_of_the_world")
+    public List<ProductDTO> getAll() {
+        return productDTOService.getAll();
     }
 
 
-    @PutMapping(value = "/update")
-    public void update(@RequestBody Product product) {
-        product.setHistories(null);
-        service.update(product);
-    }
 
-    @DeleteMapping(value = "/delete")
-    public void delete(@RequestParam Long id){
-        service.delete(id);
-    }
+
+//    @PutMapping(value = "/update")
+//    public void update(@RequestBody Product product) {
+//        product.setHistories(null);
+//        service.update(product);
+//    }
+//
+//    @DeleteMapping(value = "/delete")
+//    public void delete(@RequestParam Long id){
+//        service.delete(id);
+//    }
 }
