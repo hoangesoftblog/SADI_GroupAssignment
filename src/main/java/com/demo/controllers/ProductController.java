@@ -40,7 +40,7 @@ public class ProductController {
     public ProductWithMoreLikeThisDTOService productWithMoreLikeThisDTOService;
 
     @GetMapping(value = "/get/{id}")
-//    @Cacheable(value = "product", key = "#id", unless = "#result == null")
+    @Cacheable(value = "product", key = "#id", unless = "#result == null")
     public ProductWithMoreLikeThisDTO get(@PathVariable Long id){
         return productWithMoreLikeThisDTOService.get(id);
     }

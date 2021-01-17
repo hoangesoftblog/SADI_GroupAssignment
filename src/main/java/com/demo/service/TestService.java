@@ -21,7 +21,7 @@ public class TestService {
     @DataSource(DataSourceType.SLAVE)
     public String query() {
         System.out.println("=========query=====");
-        System.out.println("Search result：" + productService.getAllNotHidden());
+        System.out.println("Search result：" + productService.getAllWithPage(0));
         return null;
     }
 }
