@@ -1,24 +1,39 @@
 version: '3'
 
 services:
+#  master:
+#    image: "postgres"
+#    ports:
+#      - "5433:5432"
+#    environment:
+#      POSTGRES_DB: hello
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: h@angeSoftB1og
+#  slave1:
+#    image: "postgres"
+#    ports:
+#      - "5434:5432"
+#    environment:
+#      POSTGRES_DB: hello
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: h@angeSoftB1og
+#    depends_on:
+#      - master
   master:
-    image: "postgres"
+    container_name: master
+    image: "nebirhos/postgres-replication"
     ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_DB: hello
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: h@angeSoftB1og
-  slave1:
-    image: "postgres"
+      - 5433:5432
+  slave:
+    container_name: slave
+    image: "nebirhos/postgres-replication"
     ports:
-      - "5434:5432"
-    environment:
-      POSTGRES_DB: hello
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: h@angeSoftB1og
+      - 5434:5432
     depends_on:
       - master
+    environment:
+      REPLICATION_ROLE: slave
+      POSTGRES_MASTER_SERVICE_HOST: master
   zookeeper:
     image: zookeeper:3.5.8
     hostname: zookeeper
@@ -52,6 +67,7 @@ services:
     depends_on:
       - master
   app:
+    container_name: app
     build: .
     ports:
       - "9000:9000"
@@ -65,3 +81,6 @@ services:
     depends_on:
       - redis
 
+volumes:
+  postgresql_master_data:
+    driver: local
