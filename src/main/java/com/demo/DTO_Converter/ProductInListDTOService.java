@@ -56,11 +56,10 @@ public class ProductInListDTOService {
 //        return productDTOS;
 //    }
 
-    public List<ProductInListDTO> findByCategoryId(Long categoryId){
-        List<Product> products = productService.findByCategoryId(categoryId);
-        List<ProductInListDTO> productDTOS = products.stream()
-                .map(this::convert)
-                .collect(Collectors.toList());
+    public Page<ProductInListDTO> findByCategoryId(Long categoryId, int page_number){
+        Page<Product> products = productService.findByCategoryId(categoryId, page_number);
+        Page<ProductInListDTO> productDTOS = products
+                .map(this::convert);
         return productDTOS;
     }
 }

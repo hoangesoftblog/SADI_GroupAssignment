@@ -1,10 +1,14 @@
 package com.demo.service;
 
+import com.demo.config.AppConfig;
 import com.demo.model.Category;
 import com.demo.repository.CategoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +23,6 @@ public class CategoryService implements RemoveDependency<Category> {
 //        this.entityManager = entityManagerFactory.createEntityManager();
 //    }
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     public CategoryStore categoryStore;
 
@@ -30,7 +32,6 @@ public class CategoryService implements RemoveDependency<Category> {
      * @param shopeeCategoryID
      * @return Category
      */
-//    @Cacheable(value = "category", key = "#shopeeCategoryID", unless = "#result == null")
     public Category getCategoryByShopeeID(Long shopeeCategoryID) {
         Optional<Category> c = categoryStore.findByShopeeCategoryID(shopeeCategoryID);
 //        c.ifPresent(this::GetMethod_RemoveDependency);
@@ -58,5 +59,13 @@ public class CategoryService implements RemoveDependency<Category> {
         Optional<Category> c = categoryStore.findById(id);
         c.ifPresent(this::GetMethod_RemoveDependency);
         return c.orElse(null);
+    }
+
+    public Page<Category> getAll(int page_number){
+        Pageable pageRequest = PageRequest.of(page_number, AppConfig.CONSTANT.Pagination.page_size);
+
+        Page<Category> categories = categoryStore.findAll(pageRequest);
+        categories.forEach(this::GetMethod_RemoveDependency);
+        return categories;
     }
 }

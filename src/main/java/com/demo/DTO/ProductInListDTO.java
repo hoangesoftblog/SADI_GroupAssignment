@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ProductInListDTO implements Serializable, ProductDTOInterface {
+    private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+
     public Long id;
     public String name;
     public String description;

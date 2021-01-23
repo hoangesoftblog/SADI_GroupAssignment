@@ -27,6 +27,13 @@ public class PriceHistory implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     public Product product;
 
+    public PriceHistory() {
+    }
+
+    public PriceHistory(Long price, Date date) {
+        this.price = price;
+        this.date = date;
+    }
 
     public Long getId() {
         return id;

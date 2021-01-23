@@ -23,8 +23,8 @@ import java.util.*;
         @Index(name = "Shopee_Category", columnList = "shopeeCategoryID"),
         @Index(name = "category_name", columnList = "name")
 })
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Category implements Serializable {
 
     private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
@@ -37,12 +37,19 @@ public class Category implements Serializable {
     private String name;
 
     @Column
-    private int img;
+    private String img;
 
     @Id
     private Long shopeeCategoryID;
 
-    
+    public Category() {
+    }
+
+    public Category(Long shopeeCategoryID, String name) {
+        this.name = name;
+        this.shopeeCategoryID = shopeeCategoryID;
+    }
+
     public Long getShopeeCategoryID() {
         return shopeeCategoryID;
     }
@@ -67,11 +74,11 @@ public class Category implements Serializable {
         this.name = name;
     }
 
-    public int getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(String img) {
         this.img = img;
     }
 

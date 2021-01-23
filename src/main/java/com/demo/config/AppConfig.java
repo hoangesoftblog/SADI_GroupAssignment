@@ -1,8 +1,11 @@
 package com.demo.config;
 
+import com.demo.service.ProductService;
+import com.demo.model.RandomInterface;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class AppConfig {
@@ -30,5 +33,19 @@ public class AppConfig {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
+    }
+
+    @Primary
+    @Bean
+    public RandomInterface getProductServiceOrProducer(){
+        RandomInterface randomInterface;
+        try {
+            Class.forName("com.demo.engine.product.Consumer");
+            randomInterface = new com.demo.engine.product.Producer();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            randomInterface = new ProductService();
+        }
+        return randomInterface;
     }
 }

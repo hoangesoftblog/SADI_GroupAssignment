@@ -2,8 +2,7 @@ package com.demo.engine.product;
 
 import com.demo.config.AppConfig;
 import com.demo.model.Product;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.demo.model.RandomInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,11 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
-public class Producer {
+public class Producer implements RandomInterface {
 
     @Value(value = AppConfig.CONSTANT.Product.topic)
     private String TOPIC;

@@ -1,9 +1,12 @@
 package com.demo.DTO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductWithMoreLikeThisDTO {
+public class ProductWithMoreLikeThisDTO implements Serializable {
+    private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+
     public Long id;
     public String name;
     public List<PriceHistoryDTO> histories = new ArrayList<>();
@@ -25,11 +28,14 @@ public class ProductWithMoreLikeThisDTO {
 
 
 
-    public static class MoreLikeThisProduct {
+    public static class MoreLikeThisProduct implements Serializable {
         public List<String> images;
         public Long id;
         public String name;
         public String productAvatar;
+
+        private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+
 
         public String getProductAvatar() {
             return productAvatar;

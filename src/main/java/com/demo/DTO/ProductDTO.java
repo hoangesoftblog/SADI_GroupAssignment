@@ -9,10 +9,11 @@ import java.util.Date;
 import java.util.List;
 
 public class ProductDTO implements Serializable {
+
     public static class CategoryForProductDTO implements Serializable {
         public Long id;
         public String name;
-        public int img;
+        public String img;
         public Long shopeeCategoryID;
 
         private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
@@ -33,11 +34,11 @@ public class ProductDTO implements Serializable {
             this.name = name;
         }
 
-        public int getImg() {
+        public String getImg() {
             return img;
         }
 
-        public void setImg(int img) {
+        public void setImg(String img) {
             this.img = img;
         }
 
@@ -50,7 +51,7 @@ public class ProductDTO implements Serializable {
         }
     }
 
-//    public Long id;
+    public Long id;
     public String name;
     public List<PriceHistoryDTO> histories = new ArrayList<>();
     public String description;
@@ -82,13 +83,13 @@ public class ProductDTO implements Serializable {
 
     private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
 
-//    public Long getId() {
-//        return id;
-//    }
-//
-//    public void setId(Long id) {
-//        this.id = id;
-//    }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

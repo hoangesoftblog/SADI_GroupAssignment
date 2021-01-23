@@ -3,6 +3,7 @@ package com.demo.service;
 import com.demo.config.AppConfig;
 import com.demo.model.Category;
 import com.demo.model.Product;
+import com.demo.model.RandomInterface;
 import com.demo.repository.CategoryStore;
 import com.demo.repository.ProductStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Transactional
 @Service
-public class ProductService implements RemoveDependency<Product> {
+public class ProductService implements RemoveDependency<Product>, RandomInterface {
     @Autowired
     public ProductStore productStore;
 
@@ -192,8 +193,10 @@ public class ProductService implements RemoveDependency<Product> {
         return products;
     }
 
-    public List<Product> findByCategoryId(Long categoryId){
-        List<Product> products = productStore.findAllByCategories_ShopeeCategoryID(categoryId);
+    public Page<Product> findByCategoryId(Long categoryId, int page_number){
+        Pageable pageRequest = PageRequest.of(page_number, AppConfig.CONSTANT.Pagination.page_size);
+
+        Page<Product> products = productStore.findAllByCategories_ShopeeCategoryID(categoryId, pageRequest);
         products.forEach(this::removeDependency);
         return products;
     }

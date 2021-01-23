@@ -5,6 +5,7 @@ import com.demo.model.Category;
 import com.demo.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,5 +45,12 @@ public class CategoryDTOService {
         Optional<Category> categoryOptional = Optional.ofNullable(categoryService.getCategoryByShopeeID(shopeeCategoryID));
         CategoryDTO categoryDTO = categoryOptional.map(this::convert).orElse(null);
         return categoryDTO;
+    }
+
+    public Page<CategoryDTO> getAll(int page){
+        Page<Category> categories = categoryService.getAll(page);
+        Page<CategoryDTO> categoryDTOS = categories
+                .map(this::convert);
+        return categoryDTOS;
     }
 }

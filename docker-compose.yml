@@ -1,24 +1,6 @@
 version: '3'
 
 services:
-  master:
-    image: "postgres"
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_DB: hello
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: h@angeSoftB1og
-  slave1:
-    image: "postgres"
-    ports:
-      - "5434:5432"
-    environment:
-      POSTGRES_DB: hello
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: h@angeSoftB1og
-    depends_on:
-      - master
   zookeeper:
     image: zookeeper:3.5.8
     hostname: zookeeper
@@ -42,15 +24,35 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#    depends_on:
-#      - zookeeper
+    depends_on:
+      - zookeeper
+  master:
+    image: "nebirhos/postgres-replication"
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: hello
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: h@angeSoftB1og
+  slave1:
+    image: "nebirhos/postgres-replication"
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: hello
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: h@angeSoftB1og
+      REPLICATION_ROLE: slave
+      POSTGRES_MASTER_SERVICE_HOST: master
+    depends_on:
+      - master
   redis:
     image: redis
     hostname: redis
     ports:
       - "6379:6379"
     depends_on:
-      - master
+      - slave1
   app:
     build: .
     ports:
@@ -65,3 +67,6 @@ services:
     depends_on:
       - redis
 
+volumes:
+  postgresql_master_data:
+    driver: local

@@ -1,17 +1,12 @@
 package com.demo.controllers;
 
 
-//import com.demo.engine.product.Producer;
-
 import com.demo.DTO.ProductDTO;
 import com.demo.DTO.ProductWithMoreLikeThisDTO;
 import com.demo.DTO_Converter.ProductDTOService;
 import com.demo.DTO_Converter.ProductWithMoreLikeThisDTOService;
 import com.demo.model.Product;
-import com.demo.repository.ProductStore;
-import com.demo.service.ProductService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.demo.model.RandomInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -25,8 +20,7 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
-    public com.demo.engine.product.Producer service;
-//    public ProductService service;
+    public RandomInterface service;
 
     @PostMapping(value = "/add")
     public void add(@RequestBody Product product) {
@@ -45,19 +39,20 @@ public class ProductController {
         return productWithMoreLikeThisDTOService.get(id);
     }
 
-
     @Autowired
     public ProductDTOService productDTOService;
 
     @GetMapping(value = "/get/category/{id}")
-    public List<ProductDTO> findByCategoryId(@PathVariable Long id) { return productDTOService.findByCategoryId(id); }
+    @Cacheable(value = "product_category", key = "#id-#page", unless = "#result == null")
+    public Page<ProductDTO> findByCategoryId(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) { return productDTOService.findByCategoryId(id, page); }
 
-    @GetMapping(value = "/find")
-    public List<ProductDTO> find(@RequestParam String params) {
-        return productDTOService.find(params);
-    }
+//    @GetMapping(value = "/find")
+//    public List<ProductDTO> find(@RequestParam String params) {
+//        return productDTOService.find(params);
+//    }
 
     @GetMapping(value = "/get/all/page/{page}")
+    @Cacheable(value = "product_all", key = "#page", unless = "#result == null")
     public Page<ProductDTO> getAllNotHiddenWithPage(@PathVariable int page) {
         return productDTOService.getAllWithPage(page);
     }

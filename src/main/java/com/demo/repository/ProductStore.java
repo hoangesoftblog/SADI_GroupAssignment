@@ -32,4 +32,6 @@ public interface ProductStore extends JpaRepository<Product, Long> {
     Page<Product> findAllByHiddenIsFalse(Pageable pageable);
 
     Page<Product> findAll(Pageable pageable);
+
+    Page<Product> findAllByCategories_ShopeeCategoryID(Long categoryID, Pageable pageable);
 }

@@ -6,14 +6,16 @@ import java.util.List;
 public class CategoryDTO implements Serializable {
     public Long id;
     public String name;
-    public int img;
+    public String img;
     public Long shopeeCategoryID;
-    public List<ProductForCategoryDTO> products;
+//    public List<ProductForCategoryDTO> products;
 
     private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
 
-    public static class ProductForCategoryDTO {
-//        public Long id;
+    public static class ProductForCategoryDTO implements Serializable {
+        private static final Long serialVersionUID = Double.valueOf(Math.PI * Math.pow(10, 6)).longValue();
+
+        //        public Long id;
         public String name;
         public List<PriceHistoryDTO> histories;
         public String description;
@@ -214,11 +216,11 @@ public class CategoryDTO implements Serializable {
         this.name = name;
     }
 
-    public int getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(String img) {
         this.img = img;
     }
 
@@ -230,11 +232,11 @@ public class CategoryDTO implements Serializable {
         this.shopeeCategoryID = shopeeCategoryID;
     }
 
-    public List<ProductForCategoryDTO> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<ProductForCategoryDTO> products) {
-        this.products = products;
-    }
+//    public List<ProductForCategoryDTO> getProducts() {
+//        return products;
+//    }
+//
+//    public void setProducts(List<ProductForCategoryDTO> products) {
+//        this.products = products;
+//    }
 }
