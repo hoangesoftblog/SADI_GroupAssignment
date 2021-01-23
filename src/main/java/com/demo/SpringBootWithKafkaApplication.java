@@ -59,13 +59,13 @@ public class SpringBootWithKafkaApplication implements CommandLineRunner {
 		repository.save(admin);
 
         JSONParser parser = new JSONParser();
-	    try (FileReader reader = new FileReader("data-12381.json")) {
+	    try (FileReader reader = new FileReader("data-12380.json")) {
 			System.out.println("File exists.");
 	    	Object obj = parser.parse(reader);
 
 			JSONArray productList = (JSONArray) obj;
 
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 100 && i < productList.size(); i++) {
 				JSONObject o = (JSONObject) productList.get(i);
 				productService.add(parseProduct(o));
 			}
