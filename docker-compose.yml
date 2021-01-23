@@ -66,11 +66,20 @@ services:
       - "6379:6379"
     depends_on:
       - master
-  app:
-    container_name: app
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app1
+      - app2
+  app1:
+    container_name: app1
     build: .
     ports:
-      - "9000:9000"
+      - "9001:9000"
 #    environment:
 #      SPRING_MASTER_DATASOURCE_URL: jdbc:postgresql://master/hello
 #      SPRING_MASTER_DATASOURCE_USERNAME: postgres
@@ -78,6 +87,13 @@ services:
 #      SPRING_SLAVE_DATASOURCE_URL: jdbc:postgresql://slave1/hello
 #      SPRING_SLAVE_DATASOURCE_USERNAME: postgres
 #      SPRING_SLAVE_DATASOURCE_PASSWORD: h@angeSoftB1og
+    depends_on:
+      - redis
+  app2:
+    container_name: app2
+    build: .
+    ports:
+      - "9002:9000"
     depends_on:
       - redis
 
