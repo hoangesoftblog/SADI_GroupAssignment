@@ -53,4 +53,12 @@ public class CategoryDTOService {
                 .map(this::convert);
         return categoryDTOS;
     }
+
+    public List<CategoryDTO> findByProductIDs(List<Long> IDs) {
+        List<Category> categories = categoryService.findByProductIDs(IDs);
+        List<CategoryDTO> categoryDTOS = categories.stream()
+                .map(this::convert)
+                .collect(Collectors.toList());
+        return categoryDTOS;
+    }
 }

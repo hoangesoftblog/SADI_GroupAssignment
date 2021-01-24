@@ -26,4 +26,5 @@ public interface CategoryStore extends JpaRepository<Category, Long> {
 
     Page<Category> findAll(Pageable pageable);
 
+    List<Category> findAllByProducts_IdIn(Iterable<Long> productIDs);
 }

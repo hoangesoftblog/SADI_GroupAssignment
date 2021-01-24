@@ -68,4 +68,8 @@ public class CategoryService implements RemoveDependency<Category> {
         categories.forEach(this::GetMethod_RemoveDependency);
         return categories;
     }
+
+    public List<Category> findByProductIDs(List<Long> IDs) {
+        return categoryStore.findAllByProducts_IdIn(IDs);
+    }
 }

@@ -42,4 +42,12 @@ public class CategoryController {
         return service.getAll(page);
     }
 
+    @GetMapping(value = "/get")
+    public List<CategoryDTO> getCategoriesByProductIDs(@RequestParam(required = false) List<Long> product_ids) {
+        if(product_ids == null || product_ids.size() == 0){
+            return getAllCategories();
+        } else {
+            return service.findByProductIDs(product_ids);
+        }
+    }
 }

@@ -10,22 +10,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Bean
-    public PasswordEncoder encoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+    @Autowired
+    PasswordEncoder encoder;
 
     @Autowired
     UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        PasswordEncoder encoder = encoder();
-
 //        auth.inMemoryAuthentication()
 //                .withUser("user")
 //                .password(encoder.encode("user"))
@@ -48,14 +45,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/public").permitAll()
                 .anyRequest().permitAll()
                 .and()
-                // This enable to call
+                // This enable to call API
                 .cors().and()
                 .csrf().disable()
             .formLogin()
-                .defaultSuccessUrl("/admin")
+//                .loginPage("http://localhost:3000/login")
+                .loginProcessingUrl("/login/process")
+                .defaultSuccessUrl("http://localhost:3000")
                 .permitAll()
                 .and()
             .logout()
-                .permitAll();
+                .logoutSuccessUrl("http://localhost:3000")
+                .permitAll()
+        ;
     }
 }

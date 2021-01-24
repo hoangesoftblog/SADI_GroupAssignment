@@ -14,7 +14,7 @@ public class UserLogin {
     @Column
     String password;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Role> roles;
 
     public List<Role> getRoles() {

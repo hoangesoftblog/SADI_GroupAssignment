@@ -6,6 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AppConfig {
@@ -28,6 +30,10 @@ public class AppConfig {
         public static class Pagination {
             public final static int page_size = 20;
         }
+
+        public static class Route {
+            public final static String login = "";
+        }
     }
 
     @Bean
@@ -47,5 +53,10 @@ public class AppConfig {
             randomInterface = new ProductService();
         }
         return randomInterface;
+    }
+
+    @Bean
+    public PasswordEncoder encoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

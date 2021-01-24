@@ -56,7 +56,7 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     ports:
-      - "9090:9090"
+      - "9000:9090"
     depends_on:
       - app1
       - app2
