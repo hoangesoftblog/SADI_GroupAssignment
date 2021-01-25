@@ -81,6 +81,29 @@ services:
       - "9002:9000"
     depends_on:
       - redis
+      
+  load-balance:
+    build: ../front-end/load-balancer
+    container_name: load-balance
+    restart: always
+    ports:
+      - 3000:80
+    depends_on:
+      - react1
+      - react2
+      
+  react1:
+    build: ../front-end
+    container_name: react1
+    restart: always
+    ports:
+      - 3001:80
+  react2:
+    build: ../front-end
+    container_name: react2
+    restart: always
+    ports:
+      - 3002:80
 
 volumes:
   postgresql_master_data:
